@@ -6,13 +6,13 @@ fmt:    .asciz "Resultado: %d\n"  // Formato para imprimir el resultado
 .extern printf
 
 main:
-    // Inicialización de A, S y P con el ejemplo dado (3 * 2)
-    mov x0, #3           // A = 0011
-    mvn x1, x0           // S = -A en complemento a 2 (S = 1101)
+    // Inicialización de A, S y P
+    mov x0, #3           // Se inicializa el multiplicando, correspondiente a A
+    mvn x1, x0           // Se calcula el completo a 2 del número, que corresponde a S
     add x1, x1, #1
-    mov x2, #2           // P = 0010
+    mov x2, #-2           // Se inicializa el multiplicador, correspondiente a P
     mov x3, #0           // Bits superiores de P (inicialmente ceros)
-    mov x4, #8           // Número de iteraciones
+    mov x4, #8           // Número de iteraciones, en este caso 8 para poder realizar multiplicaciones con signo
 
 loop:
     and x5, x2, #3       // Obtener los 2 bits menos significativos de P
@@ -29,16 +29,16 @@ loop:
     beq caso_10          // Si es 10, P = P + S
 
 caso_00_11:
-    b shift_right        // No modificar P, solo desplazamiento
+    b mover_derecha        // No modificar P, solo desplazamiento
 
 caso_01:
     add x2, x2, x0       // P = P + A
-    b shift_right
+    b mover_derecha
 
 caso_10:
     add x2, x2, x1       // P = P + S
 
-shift_right:
+mover_derecha:
     asr x2, x2, #1       // Desplazamiento aritmético de P a la derecha
     subs x4, x4, #1      // Decrementar el contador de iteraciones
     bne loop
