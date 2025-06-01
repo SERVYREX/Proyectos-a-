@@ -47,8 +47,8 @@ mover_derecha:
     asr x2, x2, #1
 
     // Imprimir resultado
-    adrp x0, fmt
-    add x0, x0, :lo12:fmt
+    adrp x2, fmt
+    add x2, x2, :lo12:fmt
     mov x1, x2
     bl printf
 
