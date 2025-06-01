@@ -1,4 +1,8 @@
+.section .data
+fmt:    .asciz "Resultado: %d\n"  // Formato para imprimir el resultado
+.section .text
 .global main
+.extern printf
 main:
     // Inicialización de A, S y P
     mov x0, #3             // Se inicializa el multiplicando, correspondiente a A
@@ -41,6 +45,12 @@ mover_derecha:
     asr x2, x2, #1         // Desplazamiento aritmético de P a la derecha
     subs x4, x4, #1        // Decrementar el contador de iteraciones
     bne loop
+    
+    //Imprimir resultado
+    adrp x2, fmt
+    add x2, x2, :lo12:fmt
+    mov x1, x2
+    bl printf
     
     // Finalizar el programa
     mov x8, #93
