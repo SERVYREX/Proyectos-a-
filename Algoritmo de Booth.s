@@ -58,8 +58,3 @@ mover_derecha:
     mov x8, #93
     mov x0, #0
     svc #0
-    
-    // Finalizar el programa
-    mov x8, #93
-    mov x0, #0
-    svc #0
