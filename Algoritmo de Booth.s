@@ -1,10 +1,4 @@
-.section .data
-fmt: .asciz "Resultado: %d\n" // Formato para imprimir el resultado
-
-.section .text
 .global main
-.extern printf
-
 main:
     // Inicialización de A, S y P
     mov x0, #3             // Se inicializa el multiplicando, correspondiente a A
@@ -43,12 +37,6 @@ mover_derecha:
     subs x4, x4, #1        // Decrementar el contador de iteraciones
     bne loop
     
-    // Imprimir resultado
-    mov x1, x2             // Mueve el resultado final de x2 a x1 (segundo argumento para printf)
-    adrp x0, fmt           // Carga la dirección de fmt en x0 (primer argumento para printf)
-    add x0, x0, :lo12:fmt
-    bl printf
-
     // Finalizar el programa
     mov x8, #93
     mov x0, #0
