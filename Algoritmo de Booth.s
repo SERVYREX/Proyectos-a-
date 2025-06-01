@@ -5,16 +5,19 @@ main:
     mvn x1, x0             // Se calcula el complemento a 2 del número, que corresponde a S
     add x1, x1, #1
     mov x2, #-2            // Se inicializa el multiplicador, correspondiente a P
-    mov x3, #0             // Bits superiores de P (inicialmente ceros) - **Este registro no se usa en tu implementación actual de Booth, considera si es necesario según tu lógica.**
     mov x4, #8             // Número de iteraciones, en este caso 8 para poder realizar multiplicaciones con signo
+    mov x6, #0             // Inicialización de Q-1 en 0
 
 loop:
-    and x5, x2, #3         // Obtener los 2 bits menos significativos de P
+    and x5, x2, #1         // Obtener el bit menos significativo actual de P (Q0)
+    lsl x5, x5, #1         // Desplazar Q0 a la izquierda (Q0 << 1)
+    orr x5, x5, x6         // Combinar con Q-1 para obtener (Q0, Q-1)
+
     cmp x5, #0
-    beq caso_00_11         // Si es 00 o 11, no modificar P
+    beq caso_00_11         // Si es 00, no modificar P
 
     cmp x5, #3
-    beq caso_00_11         // También para el caso 11
+    beq caso_00_11         // Si es 11, tampoco modificar P
 
     cmp x5, #1
     beq caso_01            // Si es 01, P = P + A
@@ -31,8 +34,10 @@ caso_01:
 
 caso_10:
     add x2, x2, x1         // P = P + S
+    b mover_derecha
 
 mover_derecha:
+    and x6, x2, #1         // Guardar el bit menos significativo (Q0) en Q-1 para próxima iteración
     asr x2, x2, #1         // Desplazamiento aritmético de P a la derecha
     subs x4, x4, #1        // Decrementar el contador de iteraciones
     bne loop
