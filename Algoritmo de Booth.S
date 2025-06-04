@@ -21,20 +21,22 @@ main:
     MOV X2, #2                 
     MOV X3, #4                 
 
-    // Convertir a 4 bits con signo (complemento a dos)
+    // Convierte las entradas a 4 bits en complemento a dos
     AND X2, X2, #0xF
     AND X3, X3, #0xF
 
-    // Ajustar si >= 8 (negativo en 4 bits)
+    // Ajusta los números para estar un rango de 4 bits en complemento a dos (-8-7)
     CMP X2, #8
-    BLT skip_neg_m
+    BLT skip_neg_m           //Si el multiplicando es <8 revisa el multiplicador
     MOV X10, #16
-    SUB X2, X2, X10
-skip_neg_m:
+    SUB X2, X2, X10          //Si es >=8 resta 16 para dejarlo expresado como 4 bits en complemento a 2
+
+skip_neg_m:                 //Realiza el mismo procedimiento pero para el multiplicador
     CMP X3, #8
     BLT skip_neg_r
     MOV X10, #16
     SUB X3, X3, X10
+
 skip_neg_r:
 
     // P = multiplicador << 1
@@ -52,7 +54,7 @@ skip_neg_r:
 
     MOV X7, #4        // 4 iteraciones para 4 bits
 
-booth_loop:
+booth_loop:          //Se realiza el proceso de los ciclos del algoritmo de Booth, verificando los casos 10 y 01 para saltar a add_A o add_S
     AND X8, X4, #0b11
     CMP X8, #0b01
     B.EQ add_A
@@ -60,16 +62,16 @@ booth_loop:
     B.EQ add_S
     B shift
 
-add_A:
-    ADD X4, X4, X5
+add_A:               //Caso 01, donde se realiza P = P + A
+    ADD X4, X4, X5  
     B shift
 
-add_S:
+add_S:               //Caso 10, donde se realiza P = P + S
     ADD X4, X4, X6
     B shift
 
-shift:
-    ASR X4, X4, #1
+shift:                //Realiza los ciclos correspondientes
+    ASR X4, X4, #1    
     SUBS X7, X7, #1
     B.GT booth_loop
 
@@ -86,6 +88,7 @@ shift:
     BLT skip_convert
     MOV X11, #512
     SUB X9, X9, X11
+
 skip_convert:
 
     // Obtener tiempo de fin
