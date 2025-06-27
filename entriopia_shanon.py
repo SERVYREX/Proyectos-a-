@@ -2,16 +2,16 @@ import cv2
 import numpy as np
 from pathlib import Path
 
-def entriopiacanal(m):
+def entropiacanal(m):
     #Crea un histograma con el valor del canal ingresado
     histograma, _ = np.histogram(m, bins=256, range=(0, 256))
     #Calcula la probabilidad normalizada 
     probabilidades = histograma / histograma.sum()
     #Elimina las probabilidades "0"
     prob_no_cero = probabilidades[probabilidades > 0]
-    #Calcula la entriopia
-    entriopia = -np.sum(prob_no_cero * np.log2(prob_no_cero))
-    return entriopia
+    #Calcula la entropia
+    entropia = -np.sum(prob_no_cero * np.log2(prob_no_cero))
+    return entropia
 
 #Carga todas las imagenes, la imagen ejemplo y las reescaladas mediante ambas implementaciones 
 descargas = Path.home() / "Downloads"
@@ -31,36 +31,36 @@ canal_azulej = ejemplo[:, :, 0]
 canal_verdeej = ejemplo[:, :, 1]
 canal_rojoej = ejemplo[:, :, 2]
 
-#Calcula la entriopia de cada canal, junto a su promedio
-entriopia_azulej = entriopiacanal(canal_azulej)
-entriopia_verdeej = entriopiacanal(canal_verdeej)
-entriopia_rojoej = entriopiacanal(canal_rojoej)
-promedioej = (entriopia_azulej + entriopia_rojoej + entriopia_verdeej)/3
+#Calcula la entropia de cada canal, junto a su promedio
+entropia_azulej = entropiacanal(canal_azulej)
+entropia_verdeej = entropiacanal(canal_verdeej)
+entropia_rojoej = entropiacanal(canal_rojoej)
+promedioej = (entropia_azulej + entropia_rojoej + entropia_verdeej)/3
 
-print(f"Entriopia RGB-EJEMPLO: {promedioej:.3f}")
+print(f"Entropia RGB-EJEMPLO: {promedioej:.3f}")
 
 #Proceso analogo para la implmentacion GPU Y CPU
 canal_azulcpu = reescaladaCPU[:, :, 0]
 canal_verdecpu = reescaladaCPU[:, :, 1]
 canal_rojocpu = reescaladaCPU[:, :, 2]
 
-entriopia_azulcpu = entriopiacanal(canal_azulcpu)
-entriopia_verdecpu = entriopiacanal(canal_verdecpu)
-entriopia_rojocpu = entriopiacanal(canal_rojocpu)
-promediocpu = (entriopia_azulcpu + entriopia_rojocpu + entriopia_verdecpu)/3
+entropia_azulcpu = entropiacanal(canal_azulcpu)
+entropia_verdecpu = entropiacanal(canal_verdecpu)
+entropia_rojocpu = entropiacanal(canal_rojocpu)
+promediocpu = (entropia_azulcpu + entropia_rojocpu + entropia_verdecpu)/3
 
-print(f"Entriopia RGB-CPU: {promediocpu:.3f}")
+print(f"Entropia RGB-CPU: {promediocpu:.3f}")
 
 canal_azulgpu = reescaladaGPU[:, :, 0]
 canal_verdegpu = reescaladaGPU[:, :, 1]
 canal_rojogpu = reescaladaGPU[:, :, 2]
 
-entriopia_azulgpu = entriopiacanal(canal_azulgpu)
-entriopia_verdegpu = entriopiacanal(canal_verdegpu)
-entriopia_rojogpu = entriopiacanal(canal_rojogpu)
-promediogpu = (entriopia_azulgpu + entriopia_rojogpu + entriopia_verdegpu)/3
+entropia_azulgpu = entropiacanal(canal_azulgpu)
+entropia_verdegpu = entropiacanal(canal_verdegpu)
+entropia_rojogpu = entropiacanal(canal_rojogpu)
+promediogpu = (entropia_azulgpu + entropia_rojogpu + entropia_verdegpu)/3
 
-print(f"Entriopia RGB-GPU: {promediogpu:.3f}")
+print(f"Entropia RGB-GPU: {promediogpu:.3f}")
 
 #Calcula el indice de preservacion
 print(f"Preservacion CPU: {promedioej/promediocpu:.3f}")
