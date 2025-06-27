@@ -6,6 +6,7 @@ from pathlib import Path
 from pycuda.compiler import SourceModule
 from matplotlib import pyplot as plt
 
+## Define el kernel, reduce los bloques de 4x4 de la imagen original a un solo píxel promediando sus colores
 mod = SourceModule("""
 __global__ void procesarImagen(unsigned char* entrada, unsigned char* salida){
     __shared__ int temp[16*3];
@@ -41,39 +42,38 @@ ejemplo = cv2.imread(str(ruta))
 
 procesarImagen = mod.get_function("procesarImagen")
 
-# Cargar imagen
+# Convierte la imagen a un array unidimensional
 px= np.array(ejemplo).astype(np.uint8)
 px = px.flatten()
 
 output = np.zeros(1024*1024*3, dtype=np.uint8)
 
-# Asignación de memoria
+# Se asigna la memoria a la GPU
 pic_gpu = cuda.mem_alloc(px.nbytes)
 output_gpu = cuda.mem_alloc(output.nbytes)
 cuda.memcpy_htod(pic_gpu, px)
 
-# Crear eventos CUDA
+# Crea eventos CUDA
 start = cuda.Event()
 end = cuda.Event()
 
-# Iniciar medición
+# Inicia la medición
 start.record()
 
-# Llamar al kernel
+# Llamamos al kernel
 procesarImagen(pic_gpu, output_gpu, block=(4, 4, 1), grid=(1024, 1024, 1))
 
-# Finalizar medición
+# Finaliza la medición
 end.record()
 end.synchronize()
 
-# Tiempo en milisegundos
+# Tiempo de ejecucion en milisegundos
 tiempo_ms = start.time_till(end)
 print(f"⏱️ Tiempo de ejecución del kernel: {tiempo_ms:.4f} ms")
 
-# Recuperar y guardar imagen
+# Guardar imagen
 cuda.memcpy_dtoh(output, output_gpu)
 output = output.reshape(1024, 1024, 3).astype(np.uint8)
 archivo = "imagen_reescaladaCPU.png"
 ruta = descargas / archivo
-
 cv2.imwrite(str(ruta),output)
